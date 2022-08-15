@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="js/script.js" type="module" defer></script>
+    <title>JobTalk</title>
+</head>
+<body>
+    <header>
+        <img class="logo" src="assets/imgs/logo.png" alt="">
+        <nav>
+            <ul>
+                <li><a href="#"><img class="nav-icon" src="assets/imgs/home.svg" alt=""><span>Accueil</span></a></li>
+                <li class="active-page"><a href="#"><img class="nav-icon" src="assets/imgs/job.svg" alt=""><span>Les jobs</span></a></li>
+                <li><a href="#"><img class="nav-icon" src="assets/imgs/message.svg" alt=""><span>Messages</span></a></li>
+            </ul>
+            <a href="#"><img class="nav-icon" src="assets/imgs/logout.svg" alt=""><span>Déconnexion</span></a>
+        </nav>
+    </header>
+    <main>
+        <section class="top-section">
+            <div class="notif-container">
+                <img src="assets/imgs/notif.svg" alt=""><span class="name-account">Eva Bernett</span><img class="arrow" src="assets/imgs/arrow.svg" alt="">
+            </div>
+            <div class="title-print-container">
+                <h1>Les jobs</h1>
+                <button class="print-btn">Imprimer la page</button>
+            </div>
+        </section>
+        <section class="bottom-section">
+            <div class="filters-sort-by-container">
+                <div class="filters-btn-container">
+                    <div class="filter-btn-list">
+                        <button class="filter-btn poste-btn">Poste<img class="arrow" src="assets/imgs/arrow.svg" alt=""></button>
+                        <ul class="filter-list list-job-title" data-state="hidden">
+                            <li class="backend" data-check="unchecked"><div class="checkbox"><img data-state="hidden" src="assets/imgs/check.svg" alt=""></div><span>Dev Backend</span></li>
+                            <li class="fullstack" data-check="unchecked"><div class="checkbox"><img data-state="hidden" src="assets/imgs/check.svg" alt=""></div><span>Dev Fullstack</span></li>
+                            <li class="frontend" data-check="unchecked"><div class="checkbox"><img data-state="hidden" src="assets/imgs/check.svg" alt=""></div><span>Dev Frontend</span></li>
+                            <li class="manager" data-check="unchecked"><div class="checkbox"><img data-state="hidden" src="assets/imgs/check.svg" alt=""></div><span>Projet / Product Management</span></li>
+                        </ul>
+                    </div>
+                    <div class="filter-btn-list">
+                        <button class="filter-btn contract-btn">Contrat<img class="arrow" src="assets/imgs/arrow.svg" alt=""></button>
+                        <ul class="filter-list list-contract" data-state="hidden">
+                            <li class="cdd" data-check="unchecked"><div class="checkbox"><img data-state="hidden" src="assets/imgs/check.svg" alt=""></div><span>CDD</span></li>
+                            <li class="cdi" data-check="unchecked"><div class="checkbox"><img data-state="hidden" src="assets/imgs/check.svg" alt=""></div><span>CDI</span></li>
+                            <li class="stage" data-check="unchecked"><div class="checkbox"><img data-state="hidden" src="assets/imgs/check.svg" alt=""></div><span>Stage</span></li>
+                            <li class="alternance" data-check="unchecked"><div class="checkbox"><img data-state="hidden" src="assets/imgs/check.svg" alt=""></div><span>Alternance</span></li>
+                        </ul>
+                    </div>
+                    <div class="filter-btn-list">
+                        <button class="filter-btn remote-btn">Télétravail<img class="arrow" src="assets/imgs/arrow.svg" alt=""></button>
+                        <ul class="filter-list list-remote" data-state="hidden">
+                            <li  class="partiel" data-check="unchecked"><div class="checkbox"><img data-state="hidden" src="assets/imgs/check.svg" alt=""></div><span>Télétravail partiel</span></li>
+                            <li  class="ponctuel" data-check="unchecked"><div class="checkbox"><img data-state="hidden" src="assets/imgs/check.svg" alt=""></div><span>Télétravail ponctuel</span></li>
+                            <li  class="total" data-check="unchecked"><div class="checkbox"><img data-state="hidden" src="assets/imgs/check.svg" alt=""></div><span>Télétravail total</span></li>
+                            <li  class="non-specifie" data-check="unchecked"><div class="checkbox"><img data-state="hidden" src="assets/imgs/check.svg" alt=""></div><span>Non spécifié</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="sort-by-container">
+                    <p>Trier par :</p>
+                    <p class="active-sort-by" data-active="date"><span>Date</span> <img class="arrow" src="assets/imgs/arrow.svg" alt="">
+                        <ul class="list-sort-by" data-state="hidden">
+                            <li class="by-date" data-list="date">Par Date</li>
+                            <li class="by-salary" data-list="salaire">Par Salaire</li>
+                        </ul> 
+                    </p>
+                </div>
+            </div>
+            <div class="active-filters-container">
+                <button class="active-filter">Dev Fullstack<img class="clear-tag" src="assets/imgs/clear-tag.svg" alt=""></button>
+            </div>
+            <div class="jobs-container">
+
+            </div>
+        </section>
+    </main>
+</body>
+</html>
