@@ -710,5 +710,9 @@ main {
         transition: opacity 0.15s ease, pointer-events 0s 0s, max-height 0.05s 0.15s;
         max-height: 0px;
       }
+    
+       .filters-btn-container {
+        flex-wrap: wrap;
+      }
 }
 
