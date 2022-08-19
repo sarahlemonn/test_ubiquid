@@ -1,8 +1,9 @@
 // Déclaration de la fonction asynchrone qui permettra, une fois appelée, de récupérer les données des différents jobs
 async function loadJobs() {
-    const response = await fetch('data.json');
+    const response = await fetch('assets/data/data.json');
     let jobs = await response.json();
     if(jobs.length > 0) {
+        
         let jobContent = "";
 
         /* filtre du titre du job selon l'option choisie à partir du picker */
@@ -14,7 +15,6 @@ async function loadJobs() {
 
         /* trie des jobs selon l'option choisie à partir du picker */
         sortBy(jobs);
-
    
          /* vérification du tri par défaut - quand on arrive sur la page - (date ou salaire) */
          const sortByPicker = document.querySelector('.active-sort-by');
@@ -26,8 +26,7 @@ async function loadJobs() {
          }
         
         const tenJobs = jobs.slice(0, 20);
-       /*  console.log(tenJobs);
- */
+      
         tenJobs.forEach(job => {
 
             /*
@@ -140,7 +139,7 @@ async function loadJobs() {
         const jobsContainer = document.querySelector('.jobs-container');
         jobsContainer.innerHTML = jobContent;
 
-        viewDetails();
+        seeDetails();
        
     }
 
@@ -155,8 +154,7 @@ function displaySortBy(jobs) {
 
     let jobContent = "";
     const tenJobs = jobs.slice(0, 20);
-    /*  console.log(tenJobs);
-*/
+
      tenJobs.forEach(job => {
 
          /*
@@ -269,11 +267,11 @@ function displaySortBy(jobs) {
      const jobsContainer = document.querySelector('.jobs-container');
      jobsContainer.innerHTML = jobContent;
 
-     viewDetails();
+     seeDetails();
 }
 
 function updateSortBy(jobs, sortByDataSet1, sortByDataSet2) {
-    /* console.log(jobs) */
+
     const sortByPicker = document.querySelector('.active-sort-by');
     /* ordre par DATE */
     if(sortByPicker.dataset.active === sortByDataSet1) {
@@ -290,35 +288,181 @@ function updateSortBy(jobs, sortByDataSet1, sortByDataSet2) {
 function posteFilter(jobs) {
     const postePicker = document.querySelector('.poste-btn');
     const listJobTitle = document.querySelector('.list-job-title');
+
+    const listContract = document.querySelector('.list-contract');
+    const listRemote = document.querySelector('.list-remote');
+
     postePicker.addEventListener('click', () => {
         if(listJobTitle.dataset.state === "hidden") {
             listJobTitle.dataset.state = "visible";
+
+    // fermeture des 2 autres listes (télétravail et type de contrat)
+            listContract.dataset.state = "hidden";
+            listRemote.dataset.state = "hidden";
         } else {
             listJobTitle.dataset.state = "hidden";
         }
     })
+    
 
     const itemsJobTitle = listJobTitle.querySelectorAll('li');
     itemsJobTitle.forEach(item => {
+   
+        const activeFiltersContainer = document.querySelector('.active-filters-container');
+
+        const activeFilter = document.createElement('button');
+        activeFilter.classList.add('active-filter');
+        activeFilter.dataset.state = "display-none";
+        activeFilter.innerHTML = `<span>${item.textContent}</span><img class="clear-tag" src="assets/imgs/clear-tag.svg" alt="">`;
+        activeFiltersContainer.appendChild(activeFilter);
         item.addEventListener('click', () => {
 
             let checkedIcon = item.querySelector('img');
             let checkbox = item.querySelector('.checkbox');
 
             if(item.dataset.check !== "checked") {
+                activeFilter.dataset.state = "visible";
                 item.dataset.check = "checked";
                 checkedIcon.dataset.state = "visible";
                 checkbox.dataset.state = "visible";
-                updatePosteFilter(jobs);
+                activeFilter.addEventListener('click', () => {
+                    activeFilter.dataset.state = "display-none";
+                    item.dataset.check = "unchecked";
+                    checkedIcon.dataset.state = "hidden";
+                    checkbox.dataset.state = "hidden";
+                    filterJobs(jobs);
+                })
+                filterJobs(jobs);
+
             } else {
+                activeFilter.dataset.state = "display-none";
                 item.dataset.check = "unchecked";
                 checkedIcon.dataset.state = "hidden";
                 checkbox.dataset.state = "hidden";
-                updatePosteFilter(jobs);
+                filterJobs(jobs);
             }
         })
     })
 }
+
+// Fonction qui permet de filtrer selon le contract du poste
+function contractFilter(jobs) {
+    const contractPicker = document.querySelector('.contract-btn');
+    const listContract = document.querySelector('.list-contract');
+
+    const listJobTitle = document.querySelector('.list-job-title');
+    const listRemote = document.querySelector('.list-remote');
+
+    contractPicker.addEventListener('click', () => {
+        if(listContract.dataset.state === "hidden") {
+            listContract.dataset.state = "visible";
+
+            //fermeture autres listes
+            listJobTitle.dataset.state = "hidden";
+            listRemote.dataset.state = "hidden";
+        } else {
+            listContract.dataset.state = "hidden";
+        }
+    })
+
+    const itemsContract = listContract.querySelectorAll('li');
+    itemsContract.forEach(item => {
+        const activeFiltersContainer = document.querySelector('.active-filters-container');
+
+        const activeFilter = document.createElement('button');
+        activeFilter.classList.add('active-filter');
+        activeFilter.dataset.state = "display-none";
+        activeFilter.innerHTML = `<span>${item.textContent}</span><img class="clear-tag" src="assets/imgs/clear-tag.svg" alt="">`;
+        activeFiltersContainer.appendChild(activeFilter);
+        item.addEventListener('click', () => {
+
+            let checkedIcon = item.querySelector('img');
+            let checkbox = item.querySelector('.checkbox');
+
+            if(item.dataset.check !== "checked") {
+                activeFilter.dataset.state = "visible";
+                item.dataset.check = "checked";
+                checkedIcon.dataset.state = "visible";
+                checkbox.dataset.state = "visible";
+                activeFilter.addEventListener('click', () => {
+                    activeFilter.dataset.state = "display-none";
+                    item.dataset.check = "unchecked";
+                    checkedIcon.dataset.state = "hidden";
+                    checkbox.dataset.state = "hidden";
+                    filterJobs(jobs);
+                })
+                filterJobs(jobs);
+            } else {
+                activeFilter.dataset.state = "display-none";
+                item.dataset.check = "unchecked";
+                checkedIcon.dataset.state = "hidden";
+                checkbox.dataset.state = "hidden";
+                filterJobs(jobs);
+            }
+        })
+    })
+}
+
+
+
+// Fonction qui permet de filtrer selon le type de télétravail
+function remoteFilter(jobs) {
+    const remotePicker = document.querySelector('.remote-btn');
+    const listRemote = document.querySelector('.list-remote');
+
+    const listContract = document.querySelector('.list-contract');
+    const listJobTitle = document.querySelector('.list-job-title');
+
+    remotePicker.addEventListener('click', () => {
+        if(listRemote.dataset.state === "hidden") {
+            listRemote.dataset.state = "visible";
+
+              //fermeture autres listes
+              listJobTitle.dataset.state = "hidden";
+              listContract.dataset.state = "hidden";
+        } else {
+            listRemote.dataset.state = "hidden";
+        }
+    })
+
+    const itemsRemote = listRemote.querySelectorAll('li');
+    itemsRemote.forEach(item => {
+        const activeFiltersContainer = document.querySelector('.active-filters-container');
+
+        const activeFilter = document.createElement('button');
+        activeFilter.classList.add('active-filter');
+        activeFilter.dataset.state = "display-none";
+        activeFilter.innerHTML = `<span>${item.textContent}</span><img class="clear-tag" src="assets/imgs/clear-tag.svg" alt="">`;
+        activeFiltersContainer.appendChild(activeFilter);
+        item.addEventListener('click', () => {
+
+            let checkedIcon = item.querySelector('img');
+            let checkbox = item.querySelector('.checkbox');
+
+            if(item.dataset.check !== "checked") {
+                activeFilter.dataset.state = "visible";
+                item.dataset.check = "checked";
+                checkedIcon.dataset.state = "visible";
+                checkbox.dataset.state = "visible";
+                activeFilter.addEventListener('click', () => {
+                    activeFilter.dataset.state = "display-none";
+                    item.dataset.check = "unchecked";
+                    checkedIcon.dataset.state = "hidden";
+                    checkbox.dataset.state = "hidden";
+                    filterJobs(jobs);
+                })
+               filterJobs(jobs);
+            } else {
+                activeFilter.dataset.state = "display-none";
+                item.dataset.check = "unchecked";
+                checkedIcon.dataset.state = "hidden";
+                checkbox.dataset.state = "hidden";
+                filterJobs(jobs);
+            }
+        })
+    })
+}
+
 // fonction permettant de filtrer tous les jobs en même temps
 function filterJobs(jobs) {
     
@@ -339,9 +483,9 @@ function filterJobs(jobs) {
     // refactoring in progress
     let itemsList = [backend, fullstack, frontend, manager, cdd, cdi, stage, alternance, partiel, ponctuel, total, nonSpecifie];
 
-    function filterJobs2(jobs, arrayItemsChecked) {
+    function filterJobs2(jobs, itemsList) {
         let array = [];
-        arrayItemsChecked.forEach(item => {
+        itemsList.forEach(item => {
             let property = "";
             let value = "";
           
@@ -386,275 +530,322 @@ function filterJobs(jobs) {
                 });
             }
         })
+        let filters = {};
 
- 
-  /*       console.log(array);  */
-        let numberItemsChecked = array.length;
-        let filteredJobs = [];
-        array.forEach(item => {
-           /*  console.log(item.property) */
-            if(array.length === 1) {
-                filteredJobs = jobs.filter(job => job[item.property] === item.value)
-               /*  console.log(filteredJobs); */
-            }
-        })
-        jobs = filteredJobs;
-        return jobs;
-         /*    jobs.filter(function(job) {
-                return job
-            }) */
-            /* jobs.filter(job => job[item.property] === item.value) */
-    
-    }
+        let valueArr = array.map(function(item){ return item.propery });
+        let isDuplicate = valueArr.some(function(item, idx){ 
+    return valueArr.indexOf(item) != idx 
+});
 
-    jobs = filterJobs2(jobs, itemsList);
 
-/*     let jobsBackend = [];
-    let jobsFullstack  = [];
-    let jobsFrontend  = [];
-    let jobsManager  = []; */
+let occurrenceCriteria = 0;
 
-    /* POSTE CONDITIONS */
+        array.forEach((criteria, index) => {
+            
 
-    /* Backend sélectionné */
-/*     if(partiel.dataset.check === "checked" && ponctuel.dataset.check === "unchecked" && total.dataset.check === "unchecked" && nonSpecifie.dataset.check === "unchecked") {
- 
-        jobsBackend = jobsBackend.filter(job => job.remoteWork === "regularly")
-        console.log(jobsBackend)   
-    } else if(partiel.dataset.check === "checked" && ponctuel.dataset.check === "checked" && total.dataset.check === "unchecked" && nonSpecifie.dataset.check === "unchecked") {
-
-        jobsBackend = jobsBackend.filter(job => job.remoteWork === "regularly" || job.remoteWork === "eventually")
-        console.log(jobsBackend)   
-    } else if(partiel.dataset.check === "checked" && ponctuel.dataset.check === "checked" && total.dataset.check === "unchecked" && nonSpecifie.dataset.check === "unchecked") {
-
-        jobsBackend = jobsBackend.filter(job => job.remoteWork === "regularly" || job.remoteWork === "eventually")
-        console.log(jobsBackend)   
-    } */
-
-    // conditions qui vérifie si d'autres cases "Contrat" sont sélectionnés avec Backend
-  /*   if(backend.dataset.check === "checked" && cdd.dataset.check === "unchecked" && cdi.dataset.check === "unchecked" && stage.dataset.check === "unchecked" && alternance.dataset.check === "unchecked" && partiel.dataset.check === "unchecked" && ponctuel.dataset.check === "unchecked" && total.dataset.check === "unchecked" && nonSpecifie.dataset.check === "unchecked") {
-        jobsBackend = jobs.filter(job => job.jobTitle === "backend");
-    } else if(backend.dataset.check === "checked" && cdd.dataset.check === "unchecked" && cdi.dataset.check === "unchecked" && stage.dataset.check === "unchecked" && alternance.dataset.check === "unchecked" && partiel.dataset.check === "checked" && ponctuel.dataset.check === "unchecked" && total.dataset.check === "unchecked" && nonSpecifie.dataset.check === "unchecked") {
+            if(index > 0) {
+                let propertyBefore;
+                let indexUnderscore;
+                if(array[index - 1].property.includes("_")) {
         
-    }
-    
-    
-    if(backend.dataset.check === "checked" && cdd.dataset.check === "checked" && cdi.dataset.check === "unchecked" && stage.dataset.check === "unchecked" && alternance.dataset.check === "unchecked") {
-        jobsBackend = jobs.filter(job => job.jobTitle === "backend" && job.contractType === "cdd");
-    } else if(backend.dataset.check === "checked" && cdd.dataset.check === "checked" && cdi.dataset.check === "checked" && stage.dataset.check === "unchecked" && alternance.dataset.check === "unchecked") {
-        jobsBackend = jobs.filter(job => job.jobTitle === "backend" && (job.contractType === "cdd" || job.contractType === "cdi"));
-    } else if(backend.dataset.check === "checked" && cdd.dataset.check === "checked" && cdi.dataset.check === "checked" && stage.dataset.check === "checked" && alternance.dataset.check === "unchecked") {
-        jobsBackend = jobs.filter(job => job.jobTitle === "backend" && (job.contractType === "cdd" || job.contractType === "cdi" || job.contractType === "stage"));
-    } else if(backend.dataset.check === "checked" && cdd.dataset.check === "checked" && cdi.dataset.check === "checked" && stage.dataset.check === "checked" && alternance.dataset.check === "checked") {
-        jobsBackend = jobs.filter(job => job.jobTitle === "backend" && (job.contractType === "cdd" || job.contractType === "cdi" || job.contractType === "stage" || job.contractType === "alternance"));
-        console.log(jobsBackend)
-    } 
-
-
-
-    if(fullstack.dataset.check === "checked") {
-        jobsFullstack = jobs.filter(job => job.jobTitle === "fullstack");
-    }
-
-    if(frontend.dataset.check === "checked") {
-        jobsFrontend = jobs.filter(job => job.jobTitle === "frontend");
-    }
-
-    if(manager.dataset.check === "checked") {
-        jobsManager = jobs.filter(job => job.jobTitle === "manager");
-    }
-
-
-    if(backend.dataset.check === "unchecked" && fullstack.dataset.check === "unchecked" && frontend.dataset.check === "unchecked" && manager.dataset.check === "unchecked") {
-      
-    } else {
-        jobs = jobsBackend.concat(jobsFullstack, jobsFrontend, jobsManager); 
-    } */
-
-    updateSortBy(jobs, "salaire", "date")
-}
-
-function updatePosteFilter(jobs) {
-    const backend = document.querySelector('.backend');
-    const fullstack = document.querySelector('.fullstack');
-    const frontend = document.querySelector('.frontend');
-    const manager = document.querySelector('.manager');
-
-    let jobsBackend = [];
-    let jobsFullstack  = [];
-    let jobsFrontend  = [];
-    let jobsManager  = [];
-
-    if(backend.dataset.check === "checked") {
-        jobsBackend = jobs.filter(job => job.jobTitle === "backend");
-    }
-
-    if(fullstack.dataset.check === "checked") {
-        jobsFullstack = jobs.filter(job => job.jobTitle === "fullstack");
-    }
-
-    if(frontend.dataset.check === "checked") {
-        jobsFrontend = jobs.filter(job => job.jobTitle === "frontend");
-    }
-
-    if(manager.dataset.check === "checked") {
-        jobsManager = jobs.filter(job => job.jobTitle === "manager");
-    }
-
-
-    if(backend.dataset.check === "unchecked" && fullstack.dataset.check === "unchecked" && frontend.dataset.check === "unchecked" && manager.dataset.check === "unchecked") {
-      
-    } else {
-        jobs = jobsBackend.concat(jobsFullstack, jobsFrontend, jobsManager); 
-    }
-/* 
-    console.log(jobs) */
-    updateSortBy(jobs, "salaire", "date")
-}
-
-// Fonction qui permet de filtrer selon le titre du poste
-function contractFilter(jobs) {
-    const contractPicker = document.querySelector('.contract-btn');
-    const listContract = document.querySelector('.list-contract');
-    contractPicker.addEventListener('click', () => {
-        if(listContract.dataset.state === "hidden") {
-            listContract.dataset.state = "visible";
-        } else {
-            listContract.dataset.state = "hidden";
-        }
-    })
-
-    const itemsContract = listContract.querySelectorAll('li');
-    itemsContract.forEach(item => {
-        item.addEventListener('click', () => {
-
-            let checkedIcon = item.querySelector('img');
-            let checkbox = item.querySelector('.checkbox');
-
-            if(item.dataset.check !== "checked") {
-                item.dataset.check = "checked";
-                checkedIcon.dataset.state = "visible";
-                checkbox.dataset.state = "visible";
-                updateContractFilter(jobs);
+                    indexUnderscore = array[index - 1].property.indexOf("_");
+                    
+                    propertyBefore = array[index - 1].property.slice(0, indexUnderscore);
+              
+                if(criteria.property === propertyBefore) {
+                    criteria.property = criteria.property.concat(`_${index}`)
+  
+                    occurrenceCriteria++;
+                  
+                }
+                filters[criteria.property] = criteria.value;
             } else {
-                item.dataset.check = "unchecked";
-                checkedIcon.dataset.state = "hidden";
-                checkbox.dataset.state = "hidden";
-                updateContractFilter(jobs);
+                if(criteria.property === array[index - 1].property) {
+                    occurrenceCriteria++;
+                    criteria.property = criteria.property.concat(`_${index}`)
+
+                    filters[criteria.property] = criteria.value;
+                } else {
+                    filters[criteria.property] = criteria.value;
+                }
+            }
+               
+            } else {
+                filters[criteria.property] = criteria.value;
             }
         })
-    })
-}
 
-function updateContractFilter(jobs) {
+ 
+ 
 
-    const cdd = document.querySelector('.cdd');
-    const cdi = document.querySelector('.cdi');
-    const stage = document.querySelector('.stage');
-    const alternance = document.querySelector('.alternance');
+          let valueOccurenciesJobTitle = [];
+          let valueOccurenciesContractType = [];
+          let valueOccurenciesRemoteWork = [];
 
-    let jobsCDD = [];
-    let jobsCDI  = [];
-    let jobsStage  = [];
-    let jobsAlternance  = [];
+          let indexUnderscore;
 
-    if(cdd.dataset.check === "checked") {
-        jobsCDD = jobs.filter(job => job.contractType === "cdd");
-    }
-
-    if(cdi.dataset.check === "checked") {
-        jobsCDI = jobs.filter(job => job.contractType === "cdi");
-    }
-
-    if(stage.dataset.check === "checked") {
-        jobsStage = jobs.filter(job => job.contractType === "stage");
-    }
-
-    if(alternance.dataset.check === "checked") {
-        jobsAlternance = jobs.filter(job => job.contractType === "alternance");
-    }
-
-
-    if(cdd.dataset.check === "unchecked" && cdi.dataset.check === "unchecked" && stage.dataset.check === "unchecked" && alternance.dataset.check === "unchecked") {
-      
-    } else {
-        jobs = jobsCDD.concat(jobsCDI, jobsStage, jobsAlternance); 
-    }
-
-    updateSortBy(jobs, "salaire", "date")
-}
-
-// Fonction qui permet de filtrer selon le type de télétravail
-function remoteFilter(jobs) {
-    const remotePicker = document.querySelector('.remote-btn');
-    const listRemote = document.querySelector('.list-remote');
-    remotePicker.addEventListener('click', () => {
-        if(listRemote.dataset.state === "hidden") {
-            listRemote.dataset.state = "visible";
-        } else {
-            listRemote.dataset.state = "hidden";
-        }
-    })
-
-    const itemsRemote = listRemote.querySelectorAll('li');
-    itemsRemote.forEach(item => {
-        item.addEventListener('click', () => {
-
-            let checkedIcon = item.querySelector('img');
-            let checkbox = item.querySelector('.checkbox');
-
-            if(item.dataset.check !== "checked") {
-                item.dataset.check = "checked";
-                checkedIcon.dataset.state = "visible";
-                checkbox.dataset.state = "visible";
-               updateRemoteFilter(jobs);
+          for (let key in filters) {
+            if(key.includes("_")) {
+                let oldKey = key;
+                indexUnderscore = key.indexOf("_");
+                key = key.slice(0, indexUnderscore);
+              if(key === "jobTitle") {
+                valueOccurenciesJobTitle.push({jobTitle: filters[oldKey]});
+              }
+              if(key === "contractType") {
+                valueOccurenciesContractType.push({contractType: filters[oldKey]});
+              }
+              if(key === "remoteWork") {
+                valueOccurenciesRemoteWork.push({remoteWork: filters[oldKey]});
+              }
             } else {
-                item.dataset.check = "unchecked";
-                checkedIcon.dataset.state = "hidden";
-                checkbox.dataset.state = "hidden";
-                updateRemoteFilter(jobs);
+                if(key === "jobTitle") {
+                    valueOccurenciesJobTitle.push({jobTitle: filters[key]});
+                }
+                if(key === "contractType") {
+
+                    valueOccurenciesContractType.push({contractType: filters[key]});
+                }
+                if(key === "remoteWork") {
+                    valueOccurenciesRemoteWork.push({remoteWork: filters[key]});
+                }
             }
-        })
-    })
+        }
+
+
+  let lengthJobTitle = valueOccurenciesJobTitle.length;
+  let lengthContractType = valueOccurenciesContractType.length;
+  let lengthRemoteWork = valueOccurenciesRemoteWork.length;
+
+
+  
+
+  let newJobsJT = [];
+  let newJobsCT = [];
+  let newJobsRW = [];
+
+  if(lengthJobTitle > 1) {
+    if(lengthContractType === 1) {
+ 
+        jobs = jobs.filter(job => job.contractType === valueOccurenciesContractType[0].contractType)
+    }
+    if(lengthContractType === 2) {
+ 
+        jobs = jobs.filter(job => job.contractType === valueOccurenciesContractType[0].contractType || job.contractType === valueOccurenciesContractType[1].contractType)
+    }
+    if(lengthContractType === 3) {
+ 
+        jobs = jobs.filter(job => job.contractType === valueOccurenciesContractType[0].contractType || job.contractType === valueOccurenciesContractType[1].contractType || job.contractType === valueOccurenciesContractType[2].contractType)
+    }
+    if(lengthContractType === 4) {
+ 
+        jobs = jobs.filter(job => job.contractType === valueOccurenciesContractType[0].contractType || job.contractType === valueOccurenciesContractType[1].contractType || job.contractType === valueOccurenciesContractType[2].contractType || job.contractType === valueOccurenciesContractType[3].contractType)
+    }
+
+    if(lengthRemoteWork === 1) {
+
+        jobs = jobs.filter(job => job.remoteWork === valueOccurenciesRemoteWork[0].remoteWork)
+    }
+    if(lengthRemoteWork === 2) {
+
+        jobs = jobs.filter(job => job.remoteWork === valueOccurenciesRemoteWork[0].remoteWork || job.remoteWork === valueOccurenciesRemoteWork[1].remoteWork)
+    }
+    if(lengthRemoteWork === 3) {
+
+        jobs = jobs.filter(job => job.remoteWork === valueOccurenciesRemoteWork[0].remoteWork || job.remoteWork === valueOccurenciesRemoteWork[1].remoteWork || job.remoteWork === valueOccurenciesRemoteWork[2].remoteWork)
+    }
+    if(lengthRemoteWork === 4) {
+
+        jobs = jobs.filter(job => job.remoteWork === valueOccurenciesRemoteWork[0].remoteWork || job.remoteWork === valueOccurenciesRemoteWork[1].remoteWork || job.remoteWork === valueOccurenciesRemoteWork[2].remoteWork || job.remoteWork === valueOccurenciesRemoteWork[3].remoteWork)
+    }
+
+  } 
+
+  if(lengthContractType > 1) {
+    if(lengthJobTitle === 1) {
+ 
+        jobs = jobs.filter(job => job.jobTitle === valueOccurenciesJobTitle[0].jobTitle)
+    }
+    if(lengthJobTitle === 2) {
+ 
+        jobs = jobs.filter(job => job.jobTitle === valueOccurenciesJobTitle[0].jobTitle || job.jobTitle === valueOccurenciesJobTitle[1].jobTitle)
+    }
+    if(lengthJobTitle === 3) {
+ 
+        jobs = jobs.filter(job => job.jobTitle === valueOccurenciesJobTitle[0].jobTitle || job.jobTitle === valueOccurenciesJobTitle[1].jobTitle || job.jobTitle === valueOccurenciesJobTitle[2].jobTitle)
+    }
+    if(lengthJobTitle === 4) {
+ 
+        jobs = jobs.filter(job => job.jobTitle === valueOccurenciesJobTitle[0].jobTitle || job.jobTitle === valueOccurenciesJobTitle[1].jobTitle || job.jobTitle === valueOccurenciesJobTitle[2].jobTitle || job.jobTitle === valueOccurenciesJobTitle[3].jobTitle)
+    }
+
+    if(lengthRemoteWork === 1) {
+
+        jobs = jobs.filter(job => job.remoteWork === valueOccurenciesRemoteWork[0].remoteWork)
+    }
+    if(lengthRemoteWork === 2) {
+
+        jobs = jobs.filter(job => job.remoteWork === valueOccurenciesRemoteWork[0].remoteWork || job.remoteWork === valueOccurenciesRemoteWork[1].remoteWork)
+    }
+    if(lengthRemoteWork === 3) {
+
+        jobs = jobs.filter(job => job.remoteWork === valueOccurenciesRemoteWork[0].remoteWork || job.remoteWork === valueOccurenciesRemoteWork[1].remoteWork || job.remoteWork === valueOccurenciesRemoteWork[2].remoteWork)
+    }
+    if(lengthRemoteWork === 4) {
+
+        jobs = jobs.filter(job => job.remoteWork === valueOccurenciesRemoteWork[0].remoteWork || job.remoteWork === valueOccurenciesRemoteWork[1].remoteWork || job.remoteWork === valueOccurenciesRemoteWork[2].remoteWork || job.remoteWork === valueOccurenciesRemoteWork[3].remoteWork)
+    }
+  } 
+
+  if(lengthRemoteWork > 1) {
+    if(lengthJobTitle === 1) {
+ 
+        jobs = jobs.filter(job => job.jobTitle === valueOccurenciesJobTitle[0].jobTitle)
+    }
+
+    if(lengthJobTitle === 2) {
+ 
+        jobs = jobs.filter(job => job.jobTitle === valueOccurenciesJobTitle[0].jobTitle || job.jobTitle === valueOccurenciesJobTitle[1].jobTitle)
+    }
+    if(lengthJobTitle === 3) {
+ 
+        jobs = jobs.filter(job => job.jobTitle === valueOccurenciesJobTitle[0].jobTitle || job.jobTitle === valueOccurenciesJobTitle[1].jobTitle || job.jobTitle === valueOccurenciesJobTitle[2].jobTitle)
+    }
+    if(lengthJobTitle === 4) {
+ 
+        jobs = jobs.filter(job => job.jobTitle === valueOccurenciesJobTitle[0].jobTitle || job.jobTitle === valueOccurenciesJobTitle[1].jobTitle || job.jobTitle === valueOccurenciesJobTitle[2].jobTitle || job.jobTitle === valueOccurenciesJobTitle[3].jobTitle)
+    }
+
+    if(lengthContractType === 1) {
+
+        jobs = jobs.filter(job => job.contractType === valueOccurenciesContractType[0].contractType)
+    }
+
+    if(lengthContractType === 2) {
+ 
+        jobs = jobs.filter(job => job.contractType === valueOccurenciesContractType[0].contractType || job.contractType === valueOccurenciesContractType[1].contractType)
+    }
+    if(lengthContractType === 3) {
+ 
+        jobs = jobs.filter(job => job.contractType === valueOccurenciesContractType[0].contractType || job.contractType === valueOccurenciesContractType[1].contractType || job.contractType === valueOccurenciesContractType[2].contractType)
+    }
+    if(lengthContractType === 4) {
+ 
+        jobs = jobs.filter(job => job.contractType === valueOccurenciesContractType[0].contractType || job.contractType === valueOccurenciesContractType[1].contractType || job.contractType === valueOccurenciesContractType[2].contractType || job.contractType === valueOccurenciesContractType[3].contractType)
+    }
+  } 
+
+
+
+
+    if(lengthJobTitle === 2) {
+
+            newJobsJT = jobs.filter(job => job.jobTitle === valueOccurenciesJobTitle[0].jobTitle || job.jobTitle === valueOccurenciesJobTitle[1].jobTitle)    
+    
 }
+    if(lengthJobTitle === 3) {
 
-function updateRemoteFilter(jobs) {
-
-    const partiel = document.querySelector('.partiel');
-    const ponctuel = document.querySelector('.ponctuel');
-    const total = document.querySelector('.total');
-    const nonSpecifie = document.querySelector('.non-specifie');
-
-    let jobsPartiel = [];
-    let jobsPonctuel  = [];
-    let jobsTotal  = [];
-    let jobsNonSpecifie  = [];
-
-    if(partiel.dataset.check === "checked") {
-        jobsPartiel = jobs.filter(job => job.remoteWork === "regularly");
-    }
-
-    if(ponctuel.dataset.check === "checked") {
-        jobsPonctuel = jobs.filter(job => job.remoteWork === "eventually");
-    }
-
-    if(total.dataset.check === "checked") {
-        jobsTotal = jobs.filter(job => job.remoteWork === "full");
-    }
-
-    if(nonSpecifie.dataset.check === "checked") {
-        jobsNonSpecifie = jobs.filter(job => job.remoteWork === "unknown" || job.remoteWork === "none");
-    }
-
-
-    if(partiel.dataset.check === "unchecked" && ponctuel.dataset.check === "unchecked" && total.dataset.check === "unchecked" && nonSpecifie.dataset.check === "unchecked") {
+            newJobsJT = jobs.filter(job => job.jobTitle === valueOccurenciesJobTitle[0].jobTitle || job.jobTitle === valueOccurenciesJobTitle[1].jobTitle || job.jobTitle === valueOccurenciesJobTitle[2].jobTitle)    
       
-    } else {
-        jobs = jobsPartiel.concat(jobsPonctuel, jobsTotal, jobsNonSpecifie); 
-    }
-
-    updateSortBy(jobs, "salaire", "date")
 }
+    if(lengthJobTitle === 4) {
+
+            newJobsJT = jobs.filter(job => job.jobTitle === valueOccurenciesJobTitle[0].jobTitle || job.jobTitle === valueOccurenciesJobTitle[1].jobTitle || job.jobTitle === valueOccurenciesJobTitle[2].jobTitle || job.jobTitle === valueOccurenciesJobTitle[3].jobTitle)    
+}
+
+if(lengthContractType === 2) {
+
+    newJobsCT = jobs.filter(job => job.contractType === valueOccurenciesContractType[0].contractType || job.contractType === valueOccurenciesContractType[1].contractType)    
+
+}
+if(lengthContractType === 3) {
+
+    newJobsCT = jobs.filter(job => job.contractType === valueOccurenciesContractType[0].contractType || job.contractType === valueOccurenciesContractType[1].contractType || job.contractType === valueOccurenciesContractType[2].contractType)    
+
+}
+if(lengthContractType === 4) {
+
+    newJobsCT = jobs.filter(job => job.contractType === valueOccurenciesContractType[0].contractType || job.contractType === valueOccurenciesContractType[1].contractType || job.contractType === valueOccurenciesContractType[2].contractType || job.contractType === valueOccurenciesContractType[3].contractType)    
+
+}
+
+
+
+if(lengthRemoteWork === 2) {
+
+    newJobsRW = jobs.filter(job => job.remoteWork === valueOccurenciesRemoteWork[0].remoteWork || job.remoteWork === valueOccurenciesRemoteWork[1].remoteWork)    
+
+}
+
+if(lengthRemoteWork === 3) {
+
+    newJobsRW = jobs.filter(job => job.remoteWork === valueOccurenciesRemoteWork[0].remoteWork || job.remoteWork === valueOccurenciesRemoteWork[1].remoteWork || job.remoteWork === valueOccurenciesRemoteWork[2].remoteWork)    
+
+}
+
+if(lengthRemoteWork === 4) {
+
+    newJobsRW = jobs.filter(job => job.remoteWork === valueOccurenciesRemoteWork[0].remoteWork || job.remoteWork === valueOccurenciesRemoteWork[1].remoteWork || job.remoteWork === valueOccurenciesRemoteWork[2].remoteWork || job.remoteWork === valueOccurenciesRemoteWork[3].remoteWork)    
+
+}
+
+
+if((lengthJobTitle === null || lengthJobTitle < 2) && (lengthContractType === null || lengthContractType < 2) && (lengthRemoteWork === null || lengthRemoteWork < 2)) {
+
+    jobs = jobs.filter(function(job) {
+        let indexUnderscore;
+        for (let key in filters) {
+            if(key.includes("_")) {
+                indexUnderscore = key.indexOf("_");
+                key = key.slice(0, indexUnderscore);
+            }
+            
+          if (job[key] === undefined || job[key] != filters[key])
+            return false;
+        }
+        return true;
+      });
+}
+
+if(newJobsJT.length > 0 && !(newJobsCT.length > 0) && !(newJobsRW.length > 0)) {
+   return newJobsJT;
+} 
+
+if(newJobsJT.length > 0 && newJobsCT.length > 0 && !(newJobsRW.length > 0)) {
+    return jobs;
+}
+
+if(newJobsJT.length > 0 && newJobsCT.length > 0 && newJobsRW.length > 0) {
+    return jobs;
+}
+
+if(!(newJobsJT.length > 0) && newJobsCT.length > 0 && newJobsRW.length > 0) {
+    return jobs;
+}
+
+if(!(newJobsJT.length > 0) && newJobsCT.length > 0 && !(newJobsRW.length > 0)) {
+    return newJobsCT;
+}
+
+if(!(newJobsJT.length > 0) && !(newJobsCT.length > 0) && newJobsRW.length > 0) {
+    return newJobsRW;
+}
+
+if(newJobsJT.length > 0 && !(newJobsCT.length > 0) && newJobsRW.length > 0) {
+    return jobs;
+}
+
+    return jobs;
+
+}
+  
+
+jobs =  filterJobs2(jobs, itemsList);
+  updateSortBy(jobs, "salaire", "date")
+
+}
+
+
 
 /* TRI DES OFFRES PAR DATE / SALAIRE */
 
@@ -664,7 +855,7 @@ function sortBy(jobs) {
     const listSortBy = document.querySelector('.list-sort-by');
     sortByPicker.addEventListener('click', () => {
         const dataActive = sortByPicker.dataset.active;
-      /*   console.log(listSortBy) */
+
         if(listSortBy.dataset.state === "hidden") {
             listSortBy.dataset.state = "visible";
         } else {
@@ -687,7 +878,6 @@ function sortBy(jobs) {
 
     dateItem.addEventListener('click', () => {
         if(dataActive !== "date") {
-            updateSortBy(jobs, "date", "salaire");    
             dataActive = sortByPicker.dataset.active = "date";
             sortByPicker.querySelector("span").innerText = "Date";
             listSortBy.dataset.state = "hidden";
@@ -699,9 +889,8 @@ function sortBy(jobs) {
     const salaryItem = document.querySelector('.by-salary');
 
     salaryItem.addEventListener('click', () => {
-   /*      console.log("yes") */
+ 
         if(dataActive !== "salaire") {
-            updateSortBy(jobs, "date", "salaire");
             dataActive = sortByPicker.dataset.active = "salaire";
             sortByPicker.querySelector("span").innerText = "Salaire";
             listSortBy.dataset.state = "hidden";
@@ -906,7 +1095,7 @@ function changeFormatStartDate(startDateData) {
 }
 
 // Fonction permettant de visualiser les détails de chaque job (modification du style en fonction du data-state des éléments à modifier)
-const viewDetails = () => {
+const seeDetails = () => {
     const jobCards = document.querySelectorAll('.job-container');
 
     jobCards.forEach(jobCard => {
@@ -965,3 +1154,24 @@ const printBtn = document.querySelector('.print-btn');
 printBtn.addEventListener('click', () => {
     window.print();
 })
+
+const filterBtns = document.querySelectorAll(".filter-btn");
+const filterList = document.querySelectorAll('.filter-list');
+const sortByBtn = document.querySelector('.active-sort-by');
+const listSortBy = document.querySelector('.list-sort-by');
+
+filterBtns.forEach((filterBtn, index) => {
+    document.addEventListener("click", (event) => {
+
+        if (!filterBtn.contains(event.target)) {
+         filterList[index].dataset.state = "hidden";
+        }
+
+      });
+})
+
+document.addEventListener("click", (event) => {
+  if(!sortByBtn.contains(event.target)) {
+    listSortBy.dataset.state = "hidden";
+  }
+});
