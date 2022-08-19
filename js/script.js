@@ -24,11 +24,9 @@ async function loadJobs() {
          } else if(sortByPicker.dataset.active === "date") {
            jobs.sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate))
          }
-        
-        /* limite de données récupérées */
-        const sliceJobs = jobs.slice(0, 50);
+
       
-        sliceJobs.forEach(job => {
+        jobs.forEach(job => {
 
             /*
                 Traitement des données avant insertion au niveau des balises HTML
@@ -154,9 +152,8 @@ loadJobs();
 function displaySortBy(jobs) {
 
     let jobContent = "";
-    const sliceJobs = jobs.slice(0, 50);
 
-     sliceJobs.forEach(job => {
+     jobs.forEach(job => {
 
          /*
              Traitement des données avant insertion au niveau des balises HTML
