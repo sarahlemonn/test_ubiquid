@@ -1,3 +1,11 @@
+
+const main = document.querySelector('main');
+const bottomSection = document.querySelector('.bottom-section');
+const topSection = document.querySelector('.top-section');
+/* set limit of data on first display */
+let limit = 20;
+
+
 // Déclaration de la fonction asynchrone qui permettra, une fois appelée, de récupérer les données des différents jobs
 async function loadJobs() {
     const response = await fetch('assets/data/data.json');
@@ -24,9 +32,21 @@ async function loadJobs() {
          } else if(sortByPicker.dataset.active === "date") {
            jobs.sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate))
          }
+        
+             /* display next data */
 
+main.addEventListener("scroll", () => {
+
+    if (main.scrollTop >= bottomSection.clientHeight - (topSection.clientHeight * 5)) {
+        /* display 10 next jobs each time user get to the bottom section */ 
+        limit+= 10;
+        filterJobs(jobs);
+     } 
+    })
+
+         const spliceJobs = jobs.splice(0, limit);
       
-        jobs.forEach(job => {
+        spliceJobs.forEach(job => {
 
             /*
                 Traitement des données avant insertion au niveau des balises HTML
@@ -152,8 +172,10 @@ loadJobs();
 function displaySortBy(jobs) {
 
     let jobContent = "";
+ 
+    const spliceJobs = jobs.splice(0, limit);
 
-     jobs.forEach(job => {
+     spliceJobs.forEach(job => {
 
          /*
              Traitement des données avant insertion au niveau des balises HTML
@@ -1182,3 +1204,4 @@ document.addEventListener("click", (event) => {
     listSortBy.dataset.state = "hidden";
   }
 });
+
