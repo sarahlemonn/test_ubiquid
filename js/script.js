@@ -293,7 +293,7 @@ function displaySortBy(jobs) {
 function updateSortBy(jobs) {
 
     const sortByPicker = document.querySelector('.active-sort-by');
-    /* ordre par DATE */      console.log(jobs)
+    /* ordre par DATE */      
     if(sortByPicker.dataset.active === "salaire") {
       jobs.sort((a, b) => b["salary"] - a["salary"])
  
