@@ -714,5 +714,9 @@ main {
        .filters-btn-container {
         flex-wrap: wrap;
       }
+    
+       .line {
+          width: 32px;
+       }
 }
 
