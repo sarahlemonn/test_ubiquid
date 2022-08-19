@@ -14,7 +14,7 @@ async function loadJobs() {
         remoteFilter(jobs); 
 
         /* trie des jobs selon l'option choisie à partir du picker */
-        sortBy(jobs);
+        setSortByPickerList(jobs);
    
          /* vérification du tri par défaut - quand on arrive sur la page - (date ou salaire) */
          const sortByPicker = document.querySelector('.active-sort-by');
@@ -25,9 +25,10 @@ async function loadJobs() {
            jobs.sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate))
          }
         
-        const tenJobs = jobs.slice(0, 20);
+        /* limite de données récupérées */
+        const sliceJobs = jobs.slice(0, 50);
       
-        tenJobs.forEach(job => {
+        sliceJobs.forEach(job => {
 
             /*
                 Traitement des données avant insertion au niveau des balises HTML
@@ -138,7 +139,7 @@ async function loadJobs() {
 
         const jobsContainer = document.querySelector('.jobs-container');
         jobsContainer.innerHTML = jobContent;
-
+        
         seeDetails();
        
     }
@@ -153,9 +154,9 @@ loadJobs();
 function displaySortBy(jobs) {
 
     let jobContent = "";
-    const tenJobs = jobs.slice(0, 20);
+    const sliceJobs = jobs.slice(0, 50);
 
-     tenJobs.forEach(job => {
+     sliceJobs.forEach(job => {
 
          /*
              Traitement des données avant insertion au niveau des balises HTML
@@ -270,14 +271,16 @@ function displaySortBy(jobs) {
      seeDetails();
 }
 
-function updateSortBy(jobs, sortByDataSet1, sortByDataSet2) {
+function updateSortBy(jobs) {
 
     const sortByPicker = document.querySelector('.active-sort-by');
-    /* ordre par DATE */
-    if(sortByPicker.dataset.active === sortByDataSet1) {
-      jobs.sort((a, b) => b.salary - a.salary);
-    } else if(sortByPicker.dataset.active === sortByDataSet2) {
-      jobs.sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate))
+    /* ordre par DATE */      console.log(jobs)
+    if(sortByPicker.dataset.active === "salaire") {
+      jobs.sort((a, b) => b["salary"] - a["salary"])
+ 
+
+    } else if(sortByPicker.dataset.active === "date") {
+      jobs.sort((a, b) => new Date(b["publishDate"]) - new Date(a["publishDate"]))
     }
 
     displaySortBy(jobs);
@@ -463,7 +466,7 @@ function remoteFilter(jobs) {
     })
 }
 
-// fonction permettant de filtrer tous les jobs en même temps
+// fonction permettant de croiser les filtres des jobs
 function filterJobs(jobs) {
     
     const backend = document.querySelector('.backend');
@@ -480,7 +483,7 @@ function filterJobs(jobs) {
     const ponctuel = document.querySelector('.ponctuel');
     const total = document.querySelector('.total');
     const nonSpecifie = document.querySelector('.non-specifie');
-    // refactoring in progress
+
     let itemsList = [backend, fullstack, frontend, manager, cdd, cdi, stage, alternance, partiel, ponctuel, total, nonSpecifie];
 
     function filterJobs2(jobs, itemsList) {
@@ -841,7 +844,8 @@ if(newJobsJT.length > 0 && !(newJobsCT.length > 0) && newJobsRW.length > 0) {
   
 
 jobs =  filterJobs2(jobs, itemsList);
-  updateSortBy(jobs, "salaire", "date")
+
+updateSortBy(jobs)
 
 }
 
@@ -849,7 +853,7 @@ jobs =  filterJobs2(jobs, itemsList);
 
 /* TRI DES OFFRES PAR DATE / SALAIRE */
 
-function sortBy(jobs) {
+function setSortByPickerList(jobs) {
 
     const sortByPicker = document.querySelector('.active-sort-by');
     const listSortBy = document.querySelector('.list-sort-by');
@@ -883,6 +887,8 @@ function sortBy(jobs) {
             listSortBy.dataset.state = "hidden";
     
         }
+
+        filterJobs(jobs);
    
     })
 
@@ -895,6 +901,8 @@ function sortBy(jobs) {
             sortByPicker.querySelector("span").innerText = "Salaire";
             listSortBy.dataset.state = "hidden";
         }
+
+        filterJobs(jobs)
     })
     
 }
@@ -1154,6 +1162,8 @@ const printBtn = document.querySelector('.print-btn');
 printBtn.addEventListener('click', () => {
     window.print();
 })
+
+/* close list(s) when clicking outside of list(s) */
 
 const filterBtns = document.querySelectorAll(".filter-btn");
 const filterList = document.querySelectorAll('.filter-list');
